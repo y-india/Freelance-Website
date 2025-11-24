@@ -2,6 +2,11 @@ import streamlit as st
 import json
 import os
 
+# NEW IMPORTS FOR GOOGLE SHEETS
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime
+
 st.markdown("""
 <style>
 .block-container {
@@ -12,7 +17,7 @@ st.markdown("""
 .proof-nav {
     width: 100vw;
     padding: 14px 0;
-    margin: 20px 0 0 0; /* push down from top */
+    margin: 20px 0 0 0;
     background: rgba(20,20,30,0.85);
     backdrop-filter: blur(20px);
     display: flex;
@@ -26,7 +31,6 @@ st.markdown("""
     z-index: 999;
 }
 
-/* Proof links on the left */
 .proof-links {
     display: flex;
     gap: 22px;
@@ -51,7 +55,6 @@ st.markdown("""
     transform: translateY(-1px);
 }
 
-/* Right message */
 .proof-msg {
     color: #80D4FF;
     font-size: 16px;
@@ -70,58 +73,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# ⭐ SET UP GOOGLE SHEETS CONNECTION
+SCOPE = ["https://www.googleapis.com/auth/spreadsheets",
+         "https://www.googleapis.com/auth/drive"]
 
+creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"],
+    scopes=SCOPE
+)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-st.markdown("""
-<style>
-.block-container {
-    padding-top: 3rem !important;   
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-
-
-
-
-
+client = gspread.authorize(creds)
+sheet = client.open("Client_Requests").sheet1  # MUST match your Google Sheet name
 
 
 def navbar_full_width():
     st.markdown("""
     <style>
-
     .full-nav {
         width: 100vw;
         padding: 14px 0;
-        margin: 0;
         background: rgba(255,255,255,0.05);
         backdrop-filter: blur(20px);
         display: flex;
@@ -154,7 +124,6 @@ def navbar_full_width():
         box-shadow: 0 0 10px rgba(255,215,0,0.45);
         transform: translateY(-1px);
     }
-
     </style>
 
     <div class="full-nav">
@@ -164,52 +133,18 @@ def navbar_full_width():
         <a class="nav-btn" href="/Services" target="_self">Services</a>
         <a class="nav-btn" href="/Contact_Me" target="_self">Contact</a>
     </div>
-
     """, unsafe_allow_html=True)
 
 navbar_full_width()
 
+st.markdown("<br>", unsafe_allow_html=True)
 
-
-
-
-st.markdown(
-    """ 
-<br>""" , unsafe_allow_html=True
-)
-
-def save_request_to_json(data, filename="service_requests.json"):
-    """Save form submission to a JSON file. Appends if file exists."""
-    all_data = []
-
-    # Check if file exists
-    if os.path.exists(filename):
-        with open(filename, "r", encoding="utf-8") as f:
-            try:
-                all_data = json.load(f)
-            except json.JSONDecodeError:
-                all_data = []
-
-    # Append new request
-    all_data.append(data)
-
-    # Save back to JSON
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(all_data, f, indent=4, ensure_ascii=False)
-
-
-# Get query params
-# Get query params (new method)
+# Get selected service from query params
 query_params = st.query_params
-selected_service = query_params.get("service", [""])[0]  # default empty
+selected_service = query_params.get("service", [""])[0]
 
 
-
-
-
-
-
-
+# ⭐ MAIN FORM
 if selected_service:
     st.markdown(f"### 📝 Request Form for: **{selected_service}**")
 
@@ -228,26 +163,29 @@ if selected_service:
 
         submit_button = st.form_submit_button("Submit Request")
         if submit_button:
-            request_data = {
-                "service": selected_service,
-                "full_name": full_name,
-                "email": email,
-                "role": role,
-                "budget": budget,
-                "deadline": deadline,
-                "description": description,
-                "additional_notes": additional_notes,
-                "files": [f.name for f in uploaded_files] if uploaded_files else []
-            }
-            save_request_to_json(request_data)
-            st.success("✅ Thank you! I will respond within 6 hours.")
 
+            file_names = [f.name for f in uploaded_files] if uploaded_files else []
 
-            
+            # ⭐ Save to Google Sheets
+            row = [
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                selected_service,
+                full_name,
+                email,
+                role,
+                budget,
+                deadline,
+                description,
+                additional_notes,
+                ", ".join(file_names)
+            ]
+
+            sheet.append_row(row)
+
+            st.success("✅ Thank you! Your request has been saved.")
+
 elif selected_service == [""] or selected_service is None:
     st.error("Please select a service from the SERVICES.")
-
-
 
 else:
     st.error("Please select a service from the SERVICES.")
