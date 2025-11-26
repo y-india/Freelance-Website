@@ -282,7 +282,7 @@ digraph G {
     Step2 -> Step3 [color="#FF6F61", penwidth=2];
     Step3 -> Step4 [color="#FF6F61", penwidth=2];
 }
-""", use_container_width=True)
+""", width='stretch')
 
 
 # Title: #E0E7FF

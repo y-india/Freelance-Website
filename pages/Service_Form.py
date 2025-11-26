@@ -141,8 +141,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Get selected service from query params
 query_params = st.query_params
-selected_service = query_params.get("service", [""])[0]
-
+selected_service = query_params.get("service", [""][0])
 
 # ⭐ MAIN FORM
 if selected_service:

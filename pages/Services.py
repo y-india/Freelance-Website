@@ -193,21 +193,25 @@ digraph G {
     ];
 
     Step1 [label="🖱️ Step 1\nClick on Service You Want"];
-    Step2 [label="✏️ Step 3\nFill Out the Project Form"];
-    Step3 [label="📤 Step 4\nSubmit Request"];
-    Step4 [label="⏰ Step 5\nReceive Response Within 6 Hours"];
+    Step2 [label="✏️ Step 2\nFill Out the Project Form"];
+    Step3 [label="📤 Step 3\nSubmit Request"];
+    Step4 [label="⏰ Step 4\nReceive Response Within 6 Hours"];
 
     Step1 -> Step2 [color="#FFD700", penwidth=2];
     Step2 -> Step3 [color="#FFD700", penwidth=2];
     Step3 -> Step4 [color="#FFD700", penwidth=2];
 }
-""", use_container_width=True)
+""", width='stretch')
 
 
 
 st.markdown("""
             <br>
-            """, unsafe_allow_html=True)
+            """, width='stretch' , unsafe_allow_html=True)
+
+
+
+
 
 
 
@@ -259,4 +263,41 @@ for service in services:
         f"<a href='/Service_Form?service={service_param}' class='service-btn' target='_self'>{service}</a>", 
         unsafe_allow_html=True
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

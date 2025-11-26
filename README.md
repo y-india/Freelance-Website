@@ -1,6 +1,6 @@
 # Yuvraj Freelance AI/ML & Streamlit Services
 
-Welcome to my **freelance services web app**, built with **Streamlit**. This platform allows clients to explore my services, view proofs of work, and submit project requests directly.  
+Welcome to my **freelance services web app**, built with **Streamlit (and using HTML in it)**. This platform allows clients to explore my services, view proofs of work, and submit project requests directly.  
 
 ---
 
